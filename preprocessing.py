@@ -1,9 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Dec  2 17:07:27 2018
 
-@author: shreyasbhanderi
-"""
 import numpy as np
 import cv2
 def get_otsu_threshold(image):
