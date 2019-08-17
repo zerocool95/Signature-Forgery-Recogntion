@@ -9,6 +9,7 @@ import tensorflow as tf
 from keras.backend.tensorflow_backend import set_session
 from keras import objectives
 from keras import backend as K
+from keras.optimizers import SGD , Adam, RMSprop
 
 class NormL(Layer):
     def __init__(self, **kwargs):
@@ -37,11 +38,12 @@ class NormL(Layer):
         return input_shape
 
 class CustomModel():
-    def __init__(self, width = 550, height = 150, channel = 1, final_embedding_size = 2048):
+    def __init__(self, width = 550, height = 150, channel = 1, final_embedding_size = 2048, batch_size = 3):
         self.input_width = width
         self.input_height = height
         self.input_channel = channel
         self.final_embedding_size = 2048
+        self.batch_size = batch_size
 
     def MultiHeadsAttModel(self,l=8*8, d=512, dv=64, dout=512, nv = 8 ):
 
@@ -115,6 +117,26 @@ class CustomModel():
 
         return third_max, third_input
 
+
+    def _loss_tensor(self,y_true,y_pred):
+        loss=tf.convert_to_tensor(0,dtype=tf.float32)
+        total_loss=tf.convert_to_tensor(0,dtype=tf.float32)
+        g=tf.constant(1.0,shape=[1],dtype=tf.float32)
+        zero=tf.constant(0.0,shape=[1],dtype=tf.float32)
+        for i in range(0,self.batch_size,3):
+            try:
+                q_embedding=y_pred[i]
+                p_embedding=y_pred[i+1]
+                n_embedding=y_pred[i+2]
+                D_q_p=K.sqrt(K.sum((q_embedding-p_embedding)**2))
+                D_q_n=K.sqrt(K.sum((q_embedding-n_embedding)**2))
+                loss=tf.maximum(g+D_q_p-D_q_n,zero)
+                total_loss=total_loss+loss
+            except:
+                continue
+        total_loss=total_loss/(self.batch_size/3)
+        return total_loss
+
     def siamese_model(self):
         out_1, inp_1  = self.network_1()
         out_2, inp_2 = self.network_2()
@@ -127,5 +149,7 @@ class CustomModel():
         emb = Dense(2048)(emb)
 
         final_model = Model(inputs=[inp_1, inp_2, inp_3], outputs=emb)
+
+        final_model.compile(loss=self._loss_tensor, optimizer= RMSprop(lr = 1e-4)) 
 
         return final_model
