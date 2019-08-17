@@ -16,7 +16,7 @@ class Trainer():
 
     def make_triplet_datastructure(self):
         print(os.getcwd())
-        if self.batch_size % 3 !=0 :
+        if self.batch_size % 3 != 0 :
             raise "Invalid batch size"
         with open("data/triplet_test_seen.txt","r") as f:
             triplet_test_data = f.read().split("\n")
@@ -66,7 +66,7 @@ class Trainer():
                     # np.stack((out,out,out), axis = 3).reshape(batch_size,150,550, 3),
                     yield [out, out, out], np.zeros((self.batch_size, 1))
                     yield_list = []
-                mask_index = random.randint(0,3)
+                mask_index = 0#random.randint(0,3)
                 img1 = np.copy(image_dic[self.triplet_train_data[j][0]])
                 img2 = np.copy(image_dic[self.triplet_train_data[j][1]])
                 img3 = np.copy(image_dic[self.triplet_train_data[j][2]])
