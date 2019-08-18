@@ -13,9 +13,9 @@ class Trainer():
         self.epochs = epochs
         self.no_of_training_triplets = no_of_training_triplets
         self.no_of_testing_triplets = no_of_testing_triplets
+        self.image_dic = self.get_images_dict()
 
     def make_triplet_datastructure(self):
-        print(os.getcwd())
         if self.batch_size % 3 != 0 :
             raise "Invalid batch size"
         with open("data/triplet_test_seen.txt","r") as f:
@@ -100,7 +100,7 @@ class Trainer():
 
     def train(self):
         self.triplet_test_data, self.triplet_train_data = self.make_triplet_datastructure()
-        print(len(self.triplet_test_data), len(self.triplet_train_data))
+        # print(len(self.triplet_test_data), len(self.triplet_train_data))
 
         train_steps = (len(self.triplet_train_data)*3)/self.batch_size
         test_steps = (len(self.triplet_test_data)*3)/self.batch_size
@@ -113,10 +113,10 @@ class Trainer():
         for k in range(len(self.triplet_test_data)):
             test_list.append(k)
 
-        image_dic = self.get_images_dict()
+        
 
-        train_generator = self.train_gen(train_list, image_dic)
-        test_generator = self.train_gen(test_list, image_dic)
+        train_generator = self.train_gen(train_list, self.image_dic)
+        test_generator = self.train_gen(test_list, self.image_dic)
 
 
         if os.path.exists('data/weights/') == False:
@@ -125,7 +125,7 @@ class Trainer():
         custom_model_obj = CustomModel()
         triplet_model  = custom_model_obj.siamese_model()
 
-        checkpoint = keras.callbacks.ModelCheckpoint('weights/weights.{epoch:02d}.hdf5',
+        checkpoint = keras.callbacks.ModelCheckpoint('data/weights/weights.{epoch:02d}.hdf5',
                                         monitor='val_loss', 
                                         verbose=0, 
                                         save_best_only=False, 
