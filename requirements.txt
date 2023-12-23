@@ -23,7 +23,7 @@ python-dateutil==2.7.5
 PyWavelets==1.0.1
 PyYAML==5.4
 scikit-image==0.14.1
-scipy==1.1.0
+scipy==1.10.0
 six==1.11.0
 tensorboard==1.12.1
 tensorflow==2.9.3
