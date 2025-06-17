@@ -17,7 +17,7 @@ networkx==2.2
 numpy==1.22.0
 opencv-python==4.8.1.78
 Pillow==10.3.0
-protobuf==3.6.1
+protobuf==4.25.8
 pyparsing==2.3.0
 python-dateutil==2.7.5
 PyWavelets==1.0.1
